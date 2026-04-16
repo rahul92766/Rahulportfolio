@@ -1,1 +1,41 @@
-yaml name: Deploy to GitHub Pages on: push: branches: - main # Ya aapki default branch ka naam jobs: build-and-deploy: runs-on: ubuntu-latest steps: - name: Checkout Repository uses: actions/checkout@v3 - name: Setup Node.js uses: actions/setup-node@v3 with: node-version: 18 # Ya jo version aap use karte hain - name: Install Dependencies run: npm install - name: Build Project run: npm run build # Aapki build command - name: Deploy to GitHub Pages uses: JamesIves/github-pages-deploy-action@v4 with: folder: build # Jahan index.htm
+name: Deploy to GitHub Pages
+
+# Ye workflow tab chalega jab aap 'main' branch par code push karenge
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write # Ye permission zaroori hai taaki action gh-pages branch bana sake
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Repository se code fetch karna
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. Node.js environment set karna
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm' # Faster builds ke liye caching enable ki hai
+
+      # 3. Dependencies install karna
+      - name: Install Dependencies
+        run: npm install
+
+      # 4. Project build karna (Production ready files create karna)
+      - name: Build Project
+        run: npm run build
+
+      # 5. Build folder ko GitHub Pages branch par deploy karna
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: build # Agar Vite use kar rahe hain toh yahan 'dist' likhein
+          branch: gh-pages # Default deployment branch
